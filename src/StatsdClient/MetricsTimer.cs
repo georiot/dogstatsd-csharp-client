@@ -4,19 +4,17 @@ namespace StatsdClient
 {
     public class MetricsTimer : IDisposable
     {
-        private readonly string _name;
         private readonly Stopwatch _stopWatch;
         private bool _disposed;
         private readonly double _sampleRate;
-        private readonly string[] _tags;
 
         public MetricsTimer(string name, double sampleRate = 1.0, string[] tags = null)
         {
-            _name = name;
+            Name = name;
             _stopWatch = new Stopwatch();
             _stopWatch.Start();
             _sampleRate = sampleRate;
-            _tags = tags;
+            Tags = tags;
         }
 
         public void Dispose()
@@ -25,8 +23,18 @@ namespace StatsdClient
             {
                 _disposed = true;
                 _stopWatch.Stop();
-                DogStatsd.Timer(_name, _stopWatch.ElapsedMilliseconds(), _sampleRate, _tags);
+                DogStatsd.Timer(Name, _stopWatch.ElapsedMilliseconds(), _sampleRate, Tags);
             }
         }
+
+        /// <summary>
+        /// The name of this timer. This field is allowed to be mutable so that we can change it after the timer starts.
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// The tags for this timer. This field is allowed to be mutable so that we can change it after the timer starts.
+        /// </summary>
+        public string[] Tags { get; set; }
     }
 }
